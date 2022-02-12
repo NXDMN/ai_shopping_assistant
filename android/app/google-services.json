@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "831257871977",
+    "project_id": "ai-shopping-assistant",
+    "storage_bucket": "ai-shopping-assistant.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:831257871977:android:db95799345941c91f804f8",
+        "android_client_info": {
+          "package_name": "norvin.com.ai_shopping_assistant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "831257871977-eeps4g4r95jrfn6d8kgu88tlhtpdlpp7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9fktC9H5Cv_OilcSR_87ZQzjkHT1-EvY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "831257871977-eeps4g4r95jrfn6d8kgu88tlhtpdlpp7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
