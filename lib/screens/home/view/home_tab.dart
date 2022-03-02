@@ -1,15 +1,25 @@
+import 'package:ai_shopping_assistant/screens/home/view_model/home_model.dart';
 import 'package:ai_shopping_assistant/widgets/myProductCard.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:ai_shopping_assistant/constants.dart';
+import 'package:ai_shopping_assistant/model/product.dart';
+import 'package:provider/provider.dart';
 
 class HomeTab extends StatefulWidget {
-  const HomeTab({Key? key}) : super(key: key);
+  final HomeModel model;
+
+  HomeTab({
+    required this.model,
+  });
 
   @override
   _HomeTabState createState() => _HomeTabState();
 }
 
 class _HomeTabState extends State<HomeTab> {
+  HomeModel get _model => widget.model;
+
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
@@ -25,7 +35,7 @@ class _HomeTabState extends State<HomeTab> {
                 .map((i) => Container(
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                            image: AssetImage('assets/images/banner$i.jpg'),
+                            image: AssetImage('${imagePath}banner$i.jpg'),
                             fit: BoxFit.fill),
                       ),
                     ))
@@ -33,19 +43,21 @@ class _HomeTabState extends State<HomeTab> {
           ),
         ),
         SliverPadding(
-          padding: EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(20.0),
           sliver: SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              childAspectRatio: 0.9,
+              childAspectRatio: 0.85,
               mainAxisSpacing: 10.0,
               crossAxisSpacing: 10.0,
             ),
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                return MyProductCard();
+                Product product = _model.productList[index];
+
+                return MyProductCard(product: product);
               },
-              childCount: 10,
+              childCount: _model.productList.length,
             ),
           ),
         ),

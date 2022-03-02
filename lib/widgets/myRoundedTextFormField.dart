@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class MyTextFormField extends StatelessWidget {
-  MyTextFormField({
+class MyRoundedTextFormField extends StatelessWidget {
+  MyRoundedTextFormField({
     this.text,
     this.keyboardType,
     this.validator,
@@ -26,7 +26,7 @@ class MyTextFormField extends StatelessWidget {
       decoration: InputDecoration(
         hintText: text,
         hintStyle: const TextStyle(
-          color: Colors.black,
+          color: Colors.grey,
         ),
         contentPadding:
             const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
