@@ -1,5 +1,5 @@
 class UserProfile {
-  final String id;
+  final int id;
   final String name;
   final int age;
   final String phone;

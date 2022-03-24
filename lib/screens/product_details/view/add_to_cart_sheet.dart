@@ -24,11 +24,13 @@ class _AddToCartSheetState extends State<AddToCartSheet> {
   Product get _product => widget.product;
 
   int count = 1;
+  List<bool> selectedSize = [false, false, false, false, false];
+  List<bool> selectedColor = [false, false, false, false, false, false];
 
   Widget _buildSizeOptions(String size) {
     return Container(
-      height: 50.0,
-      width: 50.0,
+      height: 45.0,
+      width: 45.0,
       color: Colors.grey[200],
       child: Center(
         child: Text(
@@ -41,10 +43,10 @@ class _AddToCartSheetState extends State<AddToCartSheet> {
 
   Widget _buildColorOptions(Color color) {
     return Container(
-      height: 50.0,
-      width: 50.0,
+      height: 45.0,
+      width: 45.0,
       decoration: BoxDecoration(
-        border: Border.all(),
+        border: Border.all(color: Colors.grey),
         color: color,
       ),
     );
@@ -64,7 +66,7 @@ class _AddToCartSheetState extends State<AddToCartSheet> {
                 child: Container(
                   color: MyColors.shadow,
                   child: Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(20.0),
@@ -104,33 +106,50 @@ class _AddToCartSheetState extends State<AddToCartSheet> {
                           ),
                         ),
                         const MyDivider(),
-                        Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Size',
-                                style: MyTextStyle.mediumBold,
-                              ),
-                              SizedBox(
-                                height: 15.0,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  _buildSizeOptions('XS'),
-                                  _buildSizeOptions('S'),
-                                  _buildSizeOptions('M'),
-                                  _buildSizeOptions('L'),
-                                  _buildSizeOptions('XL'),
-                                ],
-                              )
-                            ],
+                        if (_product.category == "Fashion") ...[
+                          Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Size',
+                                  style: MyTextStyle.mediumBold,
+                                ),
+                                SizedBox(
+                                  height: 15.0,
+                                ),
+                                ToggleButtons(
+                                  renderBorder: false,
+                                  fillColor: Colors.black,
+                                  textStyle: const TextStyle(fontSize: 14),
+                                  children: [
+                                    _buildSizeOptions('XS'),
+                                    _buildSizeOptions('S'),
+                                    _buildSizeOptions('M'),
+                                    _buildSizeOptions('L'),
+                                    _buildSizeOptions('XL'),
+                                  ],
+                                  isSelected: selectedSize,
+                                  onPressed: (int index) {
+                                    setState(() {
+                                      for (int buttonIndex = 0;
+                                          buttonIndex < selectedSize.length;
+                                          buttonIndex++) {
+                                        if (buttonIndex == index) {
+                                          selectedSize[buttonIndex] = true;
+                                        } else {
+                                          selectedSize[buttonIndex] = false;
+                                        }
+                                      }
+                                    });
+                                  },
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                        const MyDivider(),
+                          const MyDivider(),
+                        ],
                         Padding(
                           padding: const EdgeInsets.all(20.0),
                           child: Column(
@@ -143,9 +162,9 @@ class _AddToCartSheetState extends State<AddToCartSheet> {
                               SizedBox(
                                 height: 15.0,
                               ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
+                              ToggleButtons(
+                                renderBorder: false,
+                                fillColor: MyColors.primary,
                                 children: [
                                   _buildColorOptions(Colors.black),
                                   _buildColorOptions(Colors.white),
@@ -154,6 +173,20 @@ class _AddToCartSheetState extends State<AddToCartSheet> {
                                   _buildColorOptions(Colors.yellow),
                                   _buildColorOptions(Colors.green),
                                 ],
+                                isSelected: selectedColor,
+                                onPressed: (int index) {
+                                  setState(() {
+                                    for (int buttonIndex = 0;
+                                        buttonIndex < selectedColor.length;
+                                        buttonIndex++) {
+                                      if (buttonIndex == index) {
+                                        selectedColor[buttonIndex] = true;
+                                      } else {
+                                        selectedColor[buttonIndex] = false;
+                                      }
+                                    }
+                                  });
+                                },
                               )
                             ],
                           ),

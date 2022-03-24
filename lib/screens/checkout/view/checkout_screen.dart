@@ -1,6 +1,7 @@
 import 'package:ai_shopping_assistant/constants.dart';
 import 'package:ai_shopping_assistant/model/cartProduct.dart';
 import 'package:ai_shopping_assistant/screens/checkout/view_model/checkout_model.dart';
+import 'package:ai_shopping_assistant/screens/purchase_history/view/purchase_history_screen.dart';
 import 'package:ai_shopping_assistant/widgets/constants.dart';
 import 'package:ai_shopping_assistant/widgets/myCalculationList.dart';
 import 'package:ai_shopping_assistant/widgets/myDialog.dart';
@@ -9,8 +10,6 @@ import 'package:ai_shopping_assistant/widgets/myProductListTile.dart';
 import 'package:ai_shopping_assistant/widgets/myUnderlineTextFormField.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-enum PaymentOptions { online, card }
 
 class CheckoutScreen extends StatefulWidget {
   static const id = 'checkout_screen';
@@ -23,7 +22,7 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   late CheckoutModel _model;
   String address = "";
-  PaymentOptions? _paymentOptions;
+  PaymentOptions? _paymentOptions = PaymentOptions.card;
 
   Widget _buildPaymentOptions() {
     return Column(
@@ -39,26 +38,26 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              child: ListTile(
-                contentPadding: EdgeInsets.zero,
-                dense: true,
-                title: const Text(
-                  'Online Banking',
-                  style: MyTextStyle.small,
-                ),
-                leading: Radio<PaymentOptions>(
-                  activeColor: MyColors.primary,
-                  value: PaymentOptions.online,
-                  groupValue: _paymentOptions,
-                  onChanged: (PaymentOptions? value) {
-                    setState(() {
-                      _paymentOptions = value;
-                    });
-                  },
-                ),
-              ),
-            ),
+            // Expanded(
+            //   child: ListTile(
+            //     contentPadding: EdgeInsets.zero,
+            //     dense: true,
+            //     title: const Text(
+            //       'Online Banking',
+            //       style: MyTextStyle.small,
+            //     ),
+            //     leading: Radio<PaymentOptions>(
+            //       activeColor: MyColors.primary,
+            //       value: PaymentOptions.online,
+            //       groupValue: _paymentOptions,
+            //       onChanged: (PaymentOptions? value) {
+            //         setState(() {
+            //           _paymentOptions = value;
+            //         });
+            //       },
+            //     ),
+            //   ),
+            // ),
             Expanded(
               child: ListTile(
                 contentPadding: EdgeInsets.zero,
@@ -246,7 +245,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                     ),
                                   );
                                 } else {
-                                  if (await model.makePayment()) {
+                                  if (await model.makePayment(
+                                      _paymentOptions ?? PaymentOptions.card)) {
+                                    Navigator.pushNamed(
+                                        context, PurchaseHistoryScreen.id);
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(

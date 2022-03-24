@@ -15,8 +15,18 @@ class RegisterModel extends ChangeNotifier {
     try {
       UserCredential newUser = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
+
+      late int newId;
+
+      await FirebaseFirestore.instance
+          .collection('user')
+          .get()
+          .then((querySnapshot) {
+        newId = querySnapshot.size + 1;
+      });
+
       UserProfile user = UserProfile(
-        id: newUser.user!.uid,
+        id: newId,
         name: name,
         age: age,
         phone: phone,
@@ -25,7 +35,7 @@ class RegisterModel extends ChangeNotifier {
         preferences: [],
         searchHistory: [],
       );
-      _addUser(user);
+      _addUser(newUser.user!.uid, user);
       return true;
     } on FirebaseAuthException catch (e) {
       _errorMessage = e.message ?? 'Error occured';
@@ -33,8 +43,10 @@ class RegisterModel extends ChangeNotifier {
     }
   }
 
-  Future<void> _addUser(UserProfile user) {
-    CollectionReference users = FirebaseFirestore.instance.collection('user');
-    return users.doc(user.id).set(user.toJson());
+  Future<void> _addUser(String uid, UserProfile user) async {
+    await FirebaseFirestore.instance
+        .collection('user')
+        .doc(uid)
+        .set(user.toJson());
   }
 }

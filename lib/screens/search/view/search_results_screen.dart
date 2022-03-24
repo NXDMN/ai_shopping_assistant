@@ -11,8 +11,12 @@ import 'package:provider/provider.dart';
 
 class SearchResultsScreenArguments {
   final String searchKeyword;
+  final bool isCategory;
 
-  SearchResultsScreenArguments({required this.searchKeyword});
+  SearchResultsScreenArguments({
+    required this.searchKeyword,
+    this.isCategory = false,
+  });
 }
 
 class SearchResultsScreen extends StatefulWidget {
@@ -27,11 +31,12 @@ class SearchResultsScreen extends StatefulWidget {
 
 class _SearchResultsScreenState extends State<SearchResultsScreen> {
   String get _searchKeyword => widget.args.searchKeyword;
+  bool get _isCategory => widget.args.isCategory;
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context) => SearchResultsModel(_searchKeyword),
+      create: (context) => SearchResultsModel(_searchKeyword, _isCategory),
       child: Consumer<SearchResultsModel>(
         builder: (context, model, child) => Scaffold(
           backgroundColor: Colors.white,

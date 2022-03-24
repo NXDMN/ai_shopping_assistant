@@ -191,10 +191,10 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                     ),
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        Product product = model.productList[index];
+                        Product product = model.recommendedProductList[index];
                         return MyProductCard(product: product);
                       },
-                      childCount: model.productList.length,
+                      childCount: model.recommendedProductList.length,
                     ),
                   ),
                 ),

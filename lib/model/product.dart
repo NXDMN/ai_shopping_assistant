@@ -5,6 +5,7 @@ class Product {
   final List<String> images;
   final int stock;
   final double price;
+  final String category;
 
   Product({
     required this.id,
@@ -13,6 +14,7 @@ class Product {
     required this.images,
     required this.stock,
     required this.price,
+    required this.category,
   });
 
   Product.fromJson(Map<String, dynamic> data)
@@ -21,7 +23,8 @@ class Product {
         description = data['description'],
         images = List.castFrom<dynamic, String>(data['images']),
         stock = data['stock'],
-        price = double.parse(data['price'].toString());
+        price = double.parse(data['price'].toString()),
+        category = data['category'];
 
   Map<String, dynamic> toJson() => {
         'id': id,
@@ -30,5 +33,6 @@ class Product {
         'images': images,
         'stock': stock,
         'price': price,
+        'category': category,
       };
 }

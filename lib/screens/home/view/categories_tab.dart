@@ -53,8 +53,8 @@ class _CategoriesTabState extends State<CategoriesTab> {
               Navigator.pushNamed(
                 context,
                 SearchResultsScreen.id,
-                arguments:
-                    SearchResultsScreenArguments(searchKeyword: category.key),
+                arguments: SearchResultsScreenArguments(
+                    searchKeyword: category.key, isCategory: true),
               );
             },
           ),

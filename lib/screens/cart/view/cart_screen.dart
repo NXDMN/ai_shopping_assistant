@@ -2,6 +2,7 @@ import 'package:ai_shopping_assistant/constants.dart';
 import 'package:ai_shopping_assistant/model/cartProduct.dart';
 import 'package:ai_shopping_assistant/screens/cart/view_model/cart_model.dart';
 import 'package:ai_shopping_assistant/screens/checkout/view/checkout_screen.dart';
+import 'package:ai_shopping_assistant/screens/product_details/view/product_details_screen.dart';
 import 'package:ai_shopping_assistant/widgets/constants.dart';
 import 'package:ai_shopping_assistant/widgets/myOutlinedButton.dart';
 import 'package:flutter/material.dart';
@@ -39,87 +40,94 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Widget _buildCartProduct(CartProduct cartProduct) {
-    return Container(
-      height: 170.0,
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(20.0),
-        minVerticalPadding: 0,
-        title: Row(
-          children: [
-            if (editMode)
-              GestureDetector(
-                child: const Icon(Icons.delete),
-                onTap: () async {
-                  await _model.removeFromCart(cartProduct);
-                },
-              ),
-            Container(
-              height: 130,
-              width: 110,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  fit: BoxFit.fill,
-                  image: NetworkImage(cartProduct.image),
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, ProductDetailsScreen.id,
+            arguments:
+                ProductDetailsScreenArguments(productId: cartProduct.id));
+      },
+      child: Container(
+        height: 170.0,
+        child: ListTile(
+          contentPadding: const EdgeInsets.all(20.0),
+          minVerticalPadding: 0,
+          title: Row(
+            children: [
+              if (editMode)
+                GestureDetector(
+                  child: const Icon(Icons.delete),
+                  onTap: () async {
+                    await _model.removeFromCart(cartProduct);
+                  },
+                ),
+              Container(
+                height: 130,
+                width: 110,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.fill,
+                    image: NetworkImage(cartProduct.image),
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(
-              width: 10.0,
-            ),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    cartProduct.name,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: MyTextStyle.small,
-                  ),
-                  const SizedBox(
-                    height: 10.0,
-                  ),
-                  Text(
-                    'RM ${cartProduct.price.toStringAsFixed(2)}',
-                    style: MyTextStyle.small,
-                  ),
-                ],
+              const SizedBox(
+                width: 10.0,
               ),
-            ),
-            const SizedBox(
-              width: 10.0,
-            ),
-            Container(
-              height: 30.0,
-              width: 100.0,
-              decoration: BoxDecoration(
-                color: MyColors.primary,
-                borderRadius: BorderRadius.circular(20.0),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      cartProduct.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: MyTextStyle.small,
+                    ),
+                    const SizedBox(
+                      height: 10.0,
+                    ),
+                    Text(
+                      'RM ${cartProduct.price.toStringAsFixed(2)}',
+                      style: MyTextStyle.small,
+                    ),
+                  ],
+                ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  GestureDetector(
-                    child: const Icon(Icons.remove),
-                    onTap: () {
-                      if (cartProduct.quantity > 0) {
-                        _model.changeProductQuantity(cartProduct, false);
-                      }
-                    },
-                  ),
-                  Text(cartProduct.quantity.toString(),
-                      style: MyTextStyle.mediumSmall),
-                  GestureDetector(
-                    child: const Icon(Icons.add),
-                    onTap: () {
-                      _model.changeProductQuantity(cartProduct, true);
-                    },
-                  ),
-                ],
+              const SizedBox(
+                width: 10.0,
               ),
-            )
-          ],
+              Container(
+                height: 30.0,
+                width: 100.0,
+                decoration: BoxDecoration(
+                  color: MyColors.primary,
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    GestureDetector(
+                      child: const Icon(Icons.remove),
+                      onTap: () {
+                        if (cartProduct.quantity > 0) {
+                          _model.changeProductQuantity(cartProduct, false);
+                        }
+                      },
+                    ),
+                    Text(cartProduct.quantity.toString(),
+                        style: MyTextStyle.mediumSmall),
+                    GestureDetector(
+                      child: const Icon(Icons.add),
+                      onTap: () {
+                        _model.changeProductQuantity(cartProduct, true);
+                      },
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

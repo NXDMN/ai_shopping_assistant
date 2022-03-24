@@ -40,7 +40,7 @@ class PreferencesModel extends ChangeNotifier {
         .doc(_loggedInUser.uid)
         .get()
         .then((doc) {
-      Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
+      Map<String, dynamic> data = doc.data()!;
       UserProfile user = UserProfile.fromJson(data);
       _preferencesList = user.preferences;
     });

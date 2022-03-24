@@ -1,14 +1,15 @@
-import 'package:ai_shopping_assistant/constants.dart';
+import 'dart:convert';
+
 import 'package:ai_shopping_assistant/screens/cart/view/cart_screen.dart';
 import 'package:ai_shopping_assistant/screens/home/view/categories_tab.dart';
 import 'package:ai_shopping_assistant/screens/home/view/for_you_tab.dart';
 import 'package:ai_shopping_assistant/screens/home/view/home_tab.dart';
 import 'package:ai_shopping_assistant/screens/home/view_model/home_model.dart';
 import 'package:ai_shopping_assistant/screens/search/view/search_screen.dart';
+import 'package:ai_shopping_assistant/services/firebaseDynamicLinkService.dart';
 import 'package:ai_shopping_assistant/widgets/myDrawer.dart';
 import 'package:flutter/material.dart';
 import 'package:ai_shopping_assistant/widgets/myTabBar.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -29,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
+    FirebaseDynamicLinkService.initDynamicLink(context);
     _tabController = TabController(length: 3, vsync: this, initialIndex: 0);
   }
 

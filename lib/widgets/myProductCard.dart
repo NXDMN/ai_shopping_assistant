@@ -50,7 +50,7 @@ class MyProductCard extends StatelessWidget {
         Navigator.pushNamed(
           context,
           ProductDetailsScreen.id,
-          arguments: ProductDetailsScreenArguments(product: product),
+          arguments: ProductDetailsScreenArguments(productId: product.id),
         );
       },
     );

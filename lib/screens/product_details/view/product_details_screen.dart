@@ -11,9 +11,9 @@ import 'package:ai_shopping_assistant/widgets/constants.dart';
 import 'package:provider/provider.dart';
 
 class ProductDetailsScreenArguments {
-  final Product product;
+  final String productId;
 
-  ProductDetailsScreenArguments({required this.product});
+  ProductDetailsScreenArguments({required this.productId});
 }
 
 class ProductDetailsScreen extends StatefulWidget {
@@ -30,7 +30,7 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
-  Product get _product => widget.args.product;
+  String get _productId => widget.args.productId;
   late ProductDetailsModel _model;
 
   int current = 0;
@@ -49,7 +49,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             });
           },
         ),
-        items: _product.images
+        items: _model.product.images
             .map((i) => Container(
                   decoration: BoxDecoration(
                     image: DecorationImage(
@@ -66,7 +66,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       ),
       Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: _product.images.asMap().entries.map((entry) {
+        children: _model.product.images.asMap().entries.map((entry) {
           return GestureDetector(
             onTap: () => _controller.animateToPage(entry.key),
             child: Container(
@@ -100,7 +100,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           children: [
             Text(
               isDescription
-                  ? _product.description
+                  ? _model.product.description
                   : 'Standard delivery fee of RM 10.00 will be added.',
               style: MyTextStyle.small,
             ),
@@ -113,7 +113,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    _model = ProductDetailsModel(_product);
+    _model = ProductDetailsModel(_productId);
   }
 
   @override
@@ -147,7 +147,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             icon: const Icon(
                               Icons.share,
                             ),
-                            onPressed: () {},
+                            onPressed: () async {
+                              await model.shareProduct();
+                            },
                           ),
                           IconButton(
                             icon: const Icon(
@@ -172,7 +174,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    _product.name,
+                                    _model.product.name,
                                     maxLines: 10,
                                     style: MyTextStyle.largeBold,
                                   ),
@@ -180,14 +182,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     height: 15.0,
                                   ),
                                   Text(
-                                    'RM ${_product.price.toStringAsFixed(2)}',
+                                    'RM ${_model.product.price.toStringAsFixed(2)}',
                                     style: MyTextStyle.mediumBold,
                                   ),
                                   const SizedBox(
                                     height: 15.0,
                                   ),
                                   Text(
-                                    'In stock: ${_product.stock}',
+                                    'In stock: ${_model.product.stock}',
                                     style: MyTextStyle.small,
                                   ),
                                   const SizedBox(
@@ -237,10 +239,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       shrinkWrap: true,
                                       physics: const ClampingScrollPhysics(),
                                       scrollDirection: Axis.horizontal,
-                                      itemCount: 10,
+                                      itemCount:
+                                          _model.similarProductList.length,
                                       itemBuilder: (context, index) {
                                         Product product =
-                                            _model.productList[index];
+                                            _model.similarProductList[index];
                                         return Padding(
                                           padding: const EdgeInsets.only(
                                               right: 10.0),
@@ -279,10 +282,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           ),
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
-                              Product product = _model.productList[index];
+                              Product product =
+                                  _model.recommendedProductList[index];
                               return MyProductCard(product: product);
                             },
-                            childCount: 10,
+                            childCount: _model.recommendedProductList.length,
                           ),
                         ),
                       ),
@@ -299,7 +303,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 isScrollControlled: true,
                 builder: (context) => ChangeNotifierProvider.value(
                   value: _model,
-                  child: AddToCartSheet(product: _product),
+                  child: AddToCartSheet(product: _model.product),
                 ),
               );
             },

@@ -22,7 +22,7 @@ class _ForYouTabState extends State<ForYouTab> {
     return CustomScrollView(
       slivers: [
         SliverPadding(
-          padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0),
+          padding: const EdgeInsets.all(20.0),
           sliver: SliverGrid(
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
@@ -32,11 +32,11 @@ class _ForYouTabState extends State<ForYouTab> {
             ),
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                Product product = _model.productList[index];
+                Product product = _model.recommendedProductList[index];
 
                 return MyProductCard(product: product);
               },
-              childCount: _model.productList.length,
+              childCount: _model.recommendedProductList.length,
             ),
           ),
         ),

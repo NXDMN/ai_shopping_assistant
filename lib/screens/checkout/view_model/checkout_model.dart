@@ -1,4 +1,7 @@
+import 'package:ai_shopping_assistant/constants.dart';
 import 'package:ai_shopping_assistant/model/cartProduct.dart';
+import 'package:ai_shopping_assistant/model/favouriteProduct.dart';
+import 'package:ai_shopping_assistant/model/product.dart';
 import 'package:ai_shopping_assistant/model/purchaseHistory.dart';
 import 'package:ai_shopping_assistant/services/paymentService.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:intl/intl.dart';
+import 'package:document_analysis/document_analysis.dart';
 
 class CheckoutModel extends ChangeNotifier {
   bool _isLoading = false;
@@ -59,7 +63,7 @@ class CheckoutModel extends ChangeNotifier {
         .doc(_loggedInUser.uid)
         .get()
         .then((doc) {
-      Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
+      Map<String, dynamic> data = doc.data()!;
       _address = data['address'];
     });
   }
@@ -97,7 +101,7 @@ class CheckoutModel extends ChangeNotifier {
     _total = _subtotal + _deliveryFee;
   }
 
-  Future<bool> makePayment() async {
+  Future<bool> makePayment(PaymentOptions paymentOptions) async {
     try {
       Map<String, dynamic> data = {
         'amount': '${(_total * 100).truncate()}',
@@ -111,7 +115,7 @@ class CheckoutModel extends ChangeNotifier {
         applePay: true,
         googlePay: true,
         style: ThemeMode.dark,
-        merchantCountryCode: 'MY',
+        merchantCountryCode: 'MYS',
         merchantDisplayName: 'Shopper',
         testEnv: true,
       ));
@@ -137,10 +141,117 @@ class CheckoutModel extends ChangeNotifier {
           .doc(id)
           .set(purchaseHistory.toJson());
 
+      _changeLoading();
+      await _updatePreferences();
+      await _clearCart();
+      _changeLoading();
+
       return true;
     } on StripeException catch (e) {
       _errorMessage = e.error.localizedMessage ?? 'Error occured';
       return false;
     }
+  }
+
+  Future<void> _clearCart() async {
+    _cartProductList.clear();
+    await FirebaseFirestore.instance
+        .collection('user')
+        .doc(_loggedInUser.uid)
+        .collection('cart')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      for (DocumentSnapshot doc in querySnapshot.docs) {
+        doc.reference.delete();
+      }
+    });
+  }
+
+  Future<void> _updatePreferences() async {
+    Set<String> ids = {};
+    await FirebaseFirestore.instance
+        .collection('user')
+        .doc(_loggedInUser.uid)
+        .collection('purchaseHistory')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
+        List<CartProduct> products = PurchaseHistory.fromJson(data).products;
+        for (CartProduct product in products) {
+          ids.add(product.id);
+        }
+      });
+    });
+    await FirebaseFirestore.instance
+        .collection('user')
+        .doc(_loggedInUser.uid)
+        .collection('favourite')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        Map<String, dynamic> data = doc.data()! as Map<String, dynamic>;
+        ids.add(FavouriteProduct.fromJson(data).id);
+      });
+    });
+
+    List<int> keywordPosition = [];
+
+    List<String> docList = [];
+
+    for (int i = 0; i < ids.length; i++) {
+      String id = ids.elementAt(i);
+      for (CartProduct product in _cartProductList) {
+        if (product.id == id) {
+          keywordPosition.add(i);
+        }
+      }
+      await FirebaseFirestore.instance
+          .collection('product')
+          .doc(id)
+          .get()
+          .then((doc) {
+        Map<String, dynamic> data = doc.data()!;
+        docList.add(Product.fromJson(data).description);
+      });
+    }
+
+    docList = docList.map((doc) {
+      doc = doc.toLowerCase();
+      doc = doc.replaceAll(RegExp(r'[^\w\s]+'), '');
+      doc = doc.replaceAll(RegExp(r'[^\D]+'), '');
+      doc = doc.replaceAll("\n", '');
+      List<String> tokens = doc.split(" ");
+      tokens.removeWhere(
+          (token) => token.length < 3 || stopwords.contains(token));
+      return tokens.join(" ");
+    }).toList();
+
+    List<Map<String, double>> tfIdfProb =
+        tfIdfProbability(documentTokenizer(docList));
+
+    Set<String> preferences = {};
+    await FirebaseFirestore.instance
+        .collection('user')
+        .doc(_loggedInUser.uid)
+        .get()
+        .then((doc) {
+      Map<String, dynamic> data = doc.data()!;
+      preferences.addAll(List.castFrom<dynamic, String>(data['preferences']));
+    });
+
+    for (int i = 0; i < tfIdfProb.length; i++) {
+      if (keywordPosition.contains(i)) {
+        Map<String, double> doc = tfIdfProb[i];
+        List<String> sortedKeys = doc.keys.toList();
+        sortedKeys.sort((a, b) => doc[a]!.compareTo(doc[b]!));
+        preferences.addAll(sortedKeys.reversed.take(3));
+      }
+    }
+
+    await FirebaseFirestore.instance
+        .collection('user')
+        .doc(_loggedInUser.uid)
+        .update({'preferences': preferences.toList()});
   }
 }
